@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace QL_Diem
@@ -84,13 +86,12 @@ namespace QL_Diem
 
         public void LoadSubjects()
         {
-            string querySubject = "SELECT DISTINCT TenMon FROM MonHoc ";
+            string querySubject = "SELECT DISTINCT TenMon FROM MonHoc";
             DataTable dt = cn.Execute(querySubject); // Hàm GetData sẽ lấy dữ liệu từ SQL
 
             DataRow dr = dt.NewRow();
             dr["TenMon"] = "---Chọn môn học---";
             dt.Rows.InsertAt(dr, 0); // Chèn vào đầu danh sách
-
 
             cbxSubject.DataSource = dt;
             cbxSubject.DisplayMember = "TenMon"; // Hiển thị tên môn học
@@ -140,12 +141,12 @@ namespace QL_Diem
 
             // Query tìm điểm theo MaSV
             string queryByMSV = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
-                    d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
-                    d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
-                    d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
-                    FROM Diem d 
-                    INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon
-                    WHERE d.MaSV = '" + maSV + "'";
+                                d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
+                                d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
+                                d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
+                                FROM Diem d 
+                                INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon
+                                WHERE d.MaSV = '" + maSV + "'";
 
             DataTable dt = cn.Execute(queryByMSV);
 
@@ -171,6 +172,7 @@ namespace QL_Diem
 
             DataTable allData = cn.Execute(queryAll);
             dgvResult.DataSource = allData;
+
             // Reset các label
             lblName.Text = "";
             lblMSV.Text = "";
@@ -245,7 +247,7 @@ namespace QL_Diem
             if (cbxSemester.SelectedIndex > 0 || cbxSchoolYear.SelectedIndex > 0)
             {
                 if (cbxSubject.SelectedIndex > 0)
-                    cbxSubject.SelectedIndex = 0;  // Chỉ reset nếu đang chọn môn học
+                    cbxSubject.SelectedIndex = 0;  //reset cbxSubject nếu đang chọn môn học
             }
 
             LoadStudentScoresByYearAndSemester();
@@ -256,7 +258,7 @@ namespace QL_Diem
             if (cbxSemester.SelectedIndex > 0 || cbxSchoolYear.SelectedIndex > 0)
             {
                 if (cbxSubject.SelectedIndex > 0)
-                    cbxSubject.SelectedIndex = 0;  // Chỉ reset nếu đang chọn môn học
+                    cbxSubject.SelectedIndex = 0;  //reset cbxSubject nếu đang chọn môn học
             }
 
             LoadStudentScoresByYearAndSemester();
@@ -269,7 +271,7 @@ namespace QL_Diem
                 if (cbxSemester.SelectedIndex > 0 || cbxSchoolYear.SelectedIndex > 0)
                 {
                     cbxSemester.SelectedIndex = 0;
-                    cbxSchoolYear.SelectedIndex = 0;
+                    cbxSchoolYear.SelectedIndex = 0;//reset cbxSemester & SchoolYear neu dang duoc chon
                 }
                 LoadStudentScoresBySubject(); // Gọi ngay khi đổi sang tìm kiếm theo môn học
             }
@@ -282,7 +284,7 @@ namespace QL_Diem
                 return;// Không chọn năm học hoặc học kỳ
             }
 
-            string maSV = txtMSV.Text.Trim();
+            string maSV = lblMSV.Text.Trim();// Lấy mã sinh viên từ label MSV
 
             string semester = "";
 
@@ -297,21 +299,23 @@ namespace QL_Diem
 
             string schoolYear = cbxSchoolYear.SelectedItem.ToString();
 
+            //Truy vấn điểm của tất cả sinmh viên
             string queryAll = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
                             d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
                             d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
                             d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
                             FROM Diem d INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon " +
-                            "WHERE mh.NamHoc = '" + schoolYear + "' AND mh.KiHoc = '" + semester + "'"; // Truy vấn SQL tất cả dữ liệu
+                            "WHERE mh.NamHoc = '" + schoolYear + "' AND mh.KiHoc = '" + semester + "'";
 
+            //Truy vấn điểm theo mã sinh viên
             string queryOne = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
                             d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
                             d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
                             d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
                             FROM Diem d INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon " +
-                            "WHERE MaSV = '" + maSV + "' AND mh.NamHoc = '" + schoolYear + "' AND mh.KiHoc = '" + semester + "'"; 
+                            "WHERE MaSV = '" + maSV + "' AND mh.NamHoc = '" + schoolYear + "' AND mh.KiHoc = '" + semester + "'";
 
-            if (string.IsNullOrEmpty(txtMSV.Text))
+            if (string.IsNullOrEmpty(lblMSV.Text))
             {
                 DataTable dt = cn.Execute(queryAll);
                 dgvResult.DataSource = dt;
@@ -325,18 +329,35 @@ namespace QL_Diem
 
         public void LoadStudentScoresBySubject()
         {
-            string subject = cbxSubject.SelectedValue.ToString();
+            string maSV = lblMSV.Text.Trim(); // Lấy mã sinh viên từ label MSV
+            string subject = cbxSubject.SelectedValue.ToString();// Lấy tên môn học từ combobox Subject
 
-            string query = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
+            string queryAll = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
                             d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
                             d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
                             d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
                             FROM Diem d
                             INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon
-                            WHERE mh.TenMon = '" + subject + "'";
+                            WHERE mh.TenMon = N'" + subject + "'";
 
-            DataTable dt = cn.Execute(query);
-            dgvResult.DataSource = dt;
+            string queryOne = @"SELECT d.MaSV AS 'Mã Sinh Viên', mh.MaMon AS 'Mã Môn', mh.TenMon AS 'Tên Môn',
+                            d.HeSoDiem AS 'Hệ số điểm', d.DiemThanhPhan AS 'Điểm thành phần', d.DiemThi AS 'Điểm thi',
+                            d.DiemTBCHP AS 'Điểm TBCHP', d.DiemThang4 AS 'Điểm thang 4', d.DiemChu AS 'Điểm chữ',
+                            d.TrangThai AS 'Trạng thái', mh.KiHoc AS 'Kì học', mh.NamHoc AS 'Năm học'
+                            FROM Diem d
+                            INNER JOIN MonHoc mh ON d.MaMon = mh.MaMon
+                            WHERE d.MaSV = '" + maSV + "' AND mh.TenMon = N'" + subject + "'";
+
+            if(string.IsNullOrEmpty(lblMSV.Text))
+            {
+                DataTable dt = cn.Execute(queryAll);
+                dgvResult.DataSource = dt;
+            }
+            else
+            {
+                DataTable dt = cn.Execute(queryOne);
+                dgvResult.DataSource = dt;
+            }
         }
         
         private void btnClear_Click(object sender, EventArgs e)
@@ -365,11 +386,6 @@ namespace QL_Diem
         private void txtMSV_TextChanged(object sender, EventArgs e)
         {
             txtSearchName.Clear();
-        }
-
-        private void txtSearchName_TextChanged(object sender, EventArgs e)
-        {
-            txtMSV.Clear();
         }
 
         private void btnAddScore_Click(object sender, EventArgs e)

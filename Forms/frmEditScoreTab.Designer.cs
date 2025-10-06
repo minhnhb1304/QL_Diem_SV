@@ -94,7 +94,7 @@
             this.Controls.Add(this.txtComponentScore);
             this.Controls.Add(this.lbl1);
             this.Name = "frmEditScoreTab";
-            this.Text = "frmEditScoreTab";
+            this.Text = "Sửa thông tin điểm";
             this.Load += new System.EventHandler(this.frmEditScoreTab_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

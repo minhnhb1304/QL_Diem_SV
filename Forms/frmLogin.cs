@@ -69,5 +69,11 @@ namespace QL_Diem
                 btnExit_Click(sender, e);
             }
         }
+
+        private void frmLogin_Load(object sender, EventArgs e)
+        {
+            pbLogo.Image = Image.FromFile("..\\..\\picture_logo\\Logo_HAU.png");
+            pbLogo.SizeMode = PictureBoxSizeMode.StretchImage;
+        }
     }
 }

@@ -406,12 +406,12 @@
             // 
             // txtSearchName
             // 
+            this.txtSearchName.AllowDrop = true;
             this.txtSearchName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSearchName.Location = new System.Drawing.Point(192, 44);
             this.txtSearchName.Name = "txtSearchName";
             this.txtSearchName.Size = new System.Drawing.Size(267, 26);
             this.txtSearchName.TabIndex = 48;
-            this.txtSearchName.TextChanged += new System.EventHandler(this.txtSearchName_TextChanged);
             // 
             // label10
             // 

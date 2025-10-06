@@ -149,7 +149,7 @@
             this.Controls.Add(this.lblName);
             this.Controls.Add(this.lblSubject);
             this.Name = "frmInputScore";
-            this.Text = "frmInputScore";
+            this.Text = "Nhập thông tin điểm";
             this.Load += new System.EventHandler(this.frmInputScore_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

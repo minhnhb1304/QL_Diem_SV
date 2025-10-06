@@ -18,12 +18,11 @@ namespace QL_Diem
         public ConnectData()
         {
             //chuoi ket noi CSDL
-            string strCnn = "Data Source=FPSHEAVEN;Initial Catalog=QuanLySinhVien;Integrated Security=True;TrustServerCertificate=True";
+            string strCnn = "Data Source=localhost;Initial Catalog=QuanLySinhVien;Integrated Security=True;TrustServerCertificate=True";
             sqlConn = new SqlConnection(strCnn);
         }
 
         //phuong thuc thuc hien cau lenh strSQL truy van du lieu
-
         public DataTable Execute(string strSQL)
         {
             da = new SqlDataAdapter(strSQL, sqlConn);
